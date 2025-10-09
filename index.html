@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Palabras Clave</title>
+    <style>
+        body {
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="tfg-pro-widget" style="max-width: 1000px; margin: 30px auto; font-family: 'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;">
+        <div style="border: 1px solid #e6edf5; border-radius: 14px; background: #ffffff; box-shadow: 0 10px 25px rgba(41,128,185,0.08),0 2px 6px rgba(0,0,0,0.05); overflow: hidden; position: relative;">
+            <div style="padding: 16px 18px; background: linear-gradient(135deg,#eaf4ff 0%,#f7fbff 100%); border-bottom: 1px solid #e6edf5; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <div>
+                    <div style="margin: 0; color: #1f2d3d; font-weight: 700; font-size: 18px;">Generador de palabras clave (ES/EN) para TFG</div>
+                    <div style="margin: 6px 0 0; color: #5b6b7b; font-size: 12px;">RAKE ligero · n-gramas 1–4 · acrónimos · dominios · ES→EN</div>
+                </div>
+                <button id="tfgp-help" type="button" style="border: 1px solid #2980b9; background: #2980b9; color: #fff; padding: 8px 12px; border-radius: 10px; font-size: 13px; cursor: pointer;">Ayuda</button>
+            </div>
+            <div style="padding: 16px 18px;">
+                <div style="margin-bottom: 12px;">
+                    <div style="font-size: 12px; color: #5b6b7b; margin-bottom: 6px;">Título del TFG</div>
+                    <input id="tfgp-title" type="text" placeholder="Ej.: Sistema de recomendación con aprendizaje automático para detectar fraude" style="width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid #cfdae6; border-radius: 10px; font-size: 14px; background: #fff;">
+                </div>
+                <div style="display: table; width: 100%; border-spacing: 0;">
+                    <div style="display: table-cell; vertical-align: top; width: 30%; padding-right: 12px;">
+                        <div style="margin-bottom: 12px;">
+                            <div style="font-size: 12px; color: #5b6b7b; margin-bottom: 6px;">Dominio</div>
+                            <select id="tfgp-domain" style="width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid #cfdae6; border-radius: 10px; font-size: 14px; background: #fff;">
+                                <option value="general">General</option>
+                                <option value="cs">Informática / IA</option>
+                                <option value="bio">Biomedicina</option>
+                                <option value="edu">Educación</option>
+                                <option value="biz">Empresa/Finanzas</option>
+                                <option value="eng">Ingeniería</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <div style="font-size: 12px; color: #5b6b7b; margin-bottom: 6px;">Nº objetivo de keywords</div>
+                            <select id="tfgp-kcount" style="width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid #cfdae6; border-radius: 10px; font-size: 14px; background: #fff;">
+                                <option>4</option>
+                                <option selected>6</option>
+                                <option>8</option>
+                                <option>10</option>
+                                <option>12</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <div style="font-size: 12px; color: #5b6b7b; margin-bottom: 6px;">Opciones</div>
+                            <label style="display: block; font-size: 12px; color: #5b6b7b; margin-bottom: 6px;"><input id="tfgp-keepAcr" type="checkbox" checked style="margin-right: 6px; vertical-align: middle;">Expandir acrónimos</label>
+                            <label style="display: block; font-size: 12px; color: #5b6b7b; margin-bottom: 6px;"><input id="tfgp-keepMeth" type="checkbox" checked style="margin-right: 6px; vertical-align: middle;">Incluir métodos</label>
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <div style="font-size: 12px; color: #5b6b7b; margin-bottom: 6px;">Calidad de coincidencia</div>
+                            <div style="height: 8px; border-radius: 999px; background: #eef2f7; overflow: hidden;">
+                                <div id="tfgp-meter" style="height: 100%; background: linear-gradient(90deg,#59a2db,#2980b9); width: 0%; transition: width .3s ease;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: table-cell; vertical-align: top; width: 70%; padding-left: 12px;">
+                        <div style="margin-bottom: 12px;">
+                            <button id="tfgp-generate" type="button" style="display: inline-block; border: 1px solid #2980b9; background: #2980b9; color: #fff; padding: 8px 12px; border-radius: 10px; font-size: 13px; cursor: pointer; margin-right: 6px;">Sugerir palabras clave</button>
+                            <button id="tfgp-clear" type="button" style="display: inline-block; border: 1px solid #d1dbea; background: #f6f9fc; padding: 8px 12px; border-radius: 10px; font-size: 13px; cursor: pointer; margin-right: 6px;">Limpiar</button>
+                            <button id="tfgp-copy-es" type="button" style="display: inline-block; border: 1px solid #d1dbea; background: #f6f9fc; padding: 8px 12px; border-radius: 10px; font-size: 13px; cursor: pointer; margin-right: 6px;">Copiar ES</button>
+                            <button id="tfgp-copy-en" type="button" style="display: inline-block; border: 1px solid #d1dbea; background: #f6f9fc; padding: 8px 12px; border-radius: 10px; font-size: 13px; cursor: pointer; margin-right: 6px;">Copy EN</button>
+                            <button id="tfgp-export" type="button" style="display: inline-block; border: 1px solid #d1dbea; background: #f6f9fc; padding: 8px 12px; border-radius: 10px; font-size: 13px; cursor: pointer; margin-right: 6px;">Exportar CSV</button>
+                            <button id="tfgp-toggle-advanced" type="button" style="display: inline-block; border: 1px solid #d1dbea; background: #f6f9fc; padding: 8px 12px; border-radius: 10px; font-size: 13px; cursor: pointer; margin-top: 4px;">Mostrar edición masiva</button>
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <div style="font-size: 12px; color: #5b6b7b; margin-bottom: 6px;">Español (clic para editar; “×” elimina)</div>
+                            <div id="tfgp-chips-es" style="padding: 8px; border: 1px dashed #cfd8e3; border-radius: 10px; min-height: 46px; background: #fbfdff;"></div>
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <div style="font-size: 12px; color: #5b6b7b; margin-bottom: 6px;">English</div>
+                            <div id="tfgp-chips-en" style="padding: 8px; border: 1px dashed #cfd8e3; border-radius: 10px; min-height: 46px; background: #fbfdff;"></div>
+                        </div>
+                        <div id="tfgp-advanced" style="display: none;">
+                            <div style="height: 1px; background: #eef2f7; margin: 14px 0;"></div>
+                            <div style="margin-bottom: 12px;">
+                                <div style="font-size: 12px; color: #5b6b7b; margin-bottom: 6px;">Edición masiva (una por línea)</div>
+                                <div style="display: table; width: 100%; border-spacing: 0;">
+                                    <div style="display: table-cell; vertical-align: top; width: 50%; padding-right: 6px;">
+                                        <div id="tfgp-edit-es" contenteditable="true" style="width: 100%; box-sizing: border-box; min-height: 90px; border: 1px solid #cfdae6; border-radius: 10px; padding: 8px; background: #fff; font-size: 13px; white-space: pre-wrap;"></div>
+                                    </div>
+                                    <div style="display: table-cell; vertical-align: top; width: 50%; padding-left: 6px;">
+                                        <div id="tfgp-edit-en" contenteditable="true" style="width: 100%; box-sizing: border-box; min-height: 90px; border: 1px solid #cfdae6; border-radius: 10px; padding: 8px; background: #fff; font-size: 13px; white-space: pre-wrap;"></div>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 12px;">
+                                    <button id="tfgp-sync-from" type="button" style="display: inline-block; border: 1px solid #d1dbea; background: #f6f9fc; padding: 8px 12px; border-radius: 10px; font-size: 13px; cursor: pointer; margin-right: 6px;">Sincronizar ⇒ Chips</button>
+                                    <button id="tfgp-sync-to" type="button" style="display: inline-block; border: 1px solid #d1dbea; background: #f6f9fc; padding: 8px 12px; border-radius: 10px; font-size: 13px; cursor: pointer; margin-right: 6px;">Chips ⇒ Editor</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="font-size: 12px; color: #66788a;">Consejo: apunta a 6–8 términos específicos y con valor semántico.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="tfgp-help-panel" style="display: none; position: fixed; right: 20px; bottom: 20px; max-width: 420px; background: #ffffff; border: 1px solid #d6e4f0; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); padding: 14px; z-index: 9999;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px;">
+                <div style="font-weight: bold; color: #1f2d3d;">Ayuda rápida</div>
+                <button id="tfgp-help-close" type="button" style="border: 1px solid #e0e0e0; background: #f8f9fa; border-radius: 8px; padding: 4px 8px; cursor: pointer;">Cerrar</button>
+            </div>
+            <div style="font-size: 13px; color: #2c3e50; line-height: 1.4;">
+                <ul style="margin: 0 0 8px 18px; padding: 0;">
+                    <li>Escribe el título y pulsa <i>Sugerir palabras clave</i>.</li>
+                    <li>Las “pastillas” son palabras clave editables; clic para cambiar, “×” para eliminar.</li>
+                    <li>Usa <i>Mostrar edición masiva</i> para pegar muchas (una por línea) y sincronizar.</li>
+                    <li>El dominio guía la selección; el medidor indica la fuerza de coincidencia.</li>
+                    <li>Botones de copiar y CSV para reutilizar las listas.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            function nrm(s){ return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[“”"‘’']/g,'').replace(/\s+/g,' ').trim(); }
+            function capPhrase(s){ return (s||'').split(' ').map(function(p){return p? p.charAt(0).toUpperCase()+p.slice(1):p;}).join(' '); }
+            function uniq(arr){ var seen={}, out=[]; for(var i=0;i<arr.length;i++){var k=(arr[i]||'').replace(/\s+/g,' ').trim(); if(!k) continue; var key=nrm(k); if(!seen[key]){seen[key]=1; out.push(k);} } return out; }
+            var STOP_ES=("a,al,ante,antes,como,con,contra,de,del,desde,donde,el,la,los,las,en,entre,era,es,esta,este,estos,estas,fue,ha,han,hasta,hay,le,les,lo,mas,me,mi,muy,nos,nuestro,nuestra,para,por,que,quien,quienes,se,si,sin,sobre,son,su,sus,un,una,uno,unos,unas,y,o,u,mediante,tras,ademas,asi,cada,cual,cuales,cuyo,cuyos,cuyas,hacia,segun,tal,tales,del,al").split(',');
+            var STOP_EN=("a,an,and,are,as,at,be,by,for,from,has,have,in,is,of,on,or,that,the,these,this,those,to,was,were,with,within,into,via,using,use,study").split(',');
+            function isStop(w,lang){ var set=(lang==='en')?STOP_EN:STOP_ES; var x=nrm(w); for(var i=0;i<set.length;i++){ if(x===set[i]) return true; } return false; }
+            var ACR={"ia":"inteligencia artificial","ml":"aprendizaje automatico","dl":"aprendizaje profundo","pln":"procesamiento de lenguaje natural","nlp":"procesamiento de lenguaje natural","cv":"vision por computador","iot":"internet de las cosas","vr":"realidad virtual","ar":"realidad aumentada","se":"ingenieria de software","ux":"experiencia de usuario","ui":"interfaz de usuario","gis":"sistemas de informacion geografica","sig":"sistemas de informacion geografica","etl":"extraccion transformacion carga","etl_en":"extract transform load","cnn":"redes neuronales convolucionales","rnn":"redes neuronales recurrentes"};
+            var DOMAINS={general:[],cs:["aprendizaje automatico","inteligencia artificial","redes neuronales","vision por computador","procesamiento de lenguaje natural","mineria de datos","sistemas distribuidos","blockchain","computacion en la nube","edge computing","ingenieria de software","pruebas de software","ciberseguridad","privacidad","big data","sistemas de recomendacion"],bio:["biomedicina","genomica","proteomica","diagnostico","imagen medica","bioinformatica","salud publica","epidemiologia","medicina personalizada","biosenores","histopatologia","metabolomica"],edu:["tecnologia educativa","evaluacion formativa","analitica de aprendizaje","gamificacion","educacion inclusiva","competencias digitales","recursos educativos abiertos","aprendizaje activo"],biz:["fintech","gestion de riesgos","deteccion de fraude","analitica financiera","series temporales","marketing digital","precios dinamicos","cadena de suministro","emprendimiento"],eng:["gemelo digital","industria 4.0","mantenimiento predictivo","robotica","control pid","simulacion","vision artificial","iot industrial","sistemas embebidos","fabricacion aditiva"]};
+            var GLOSS={"analisis":"analysis","analitica":"analytics","diseno":"design","implementacion":"implementation","arquitectura":"architecture","evaluacion":"evaluation","desarrollo":"development","modelo":"model","metodologia":"methodology","algoritmo":"algorithm","algoritmos":"algorithms","sistema":"system","sistemas":"systems","aplicacion":"application","aplicaciones":"applications","propuesta":"proposal","prototipo":"prototype","caso de estudio":"case study","estudio de caso":"case study","comparativo":"benchmarking","rendimiento":"performance","precision":"accuracy","fiabilidad":"reliability","seguridad":"security","ciberseguridad":"cybersecurity","privacidad":"privacy","usabilidad":"usability","experiencia de usuario":"user experience","interfaz de usuario":"user interface","aprendizaje automatico":"machine learning","aprendizaje profundo":"deep learning","inteligencia artificial":"artificial intelligence","redes neuronales":"neural networks","vision por computador":"computer vision","procesamiento de lenguaje natural":"natural language processing","mineria de datos":"data mining","big data":"big data","internet de las cosas":"internet of things","blockchain":"blockchain","realidad virtual":"virtual reality","realidad aumentada":"augmented reality","computacion en la nube":"cloud computing","edge computing":"edge computing","bases de datos":"databases","base de datos":"database","web semantica":"semantic web","optimizacion":"optimization","simulacion":"simulation","clasificacion":"classification","segmentacion":"segmentation","deteccion":"detection","prediccion":"prediction","recomendacion":"recommendation","sostenibilidad":"sustainability","energia":"energy","educacion":"education","salud":"health","biomedicina":"biomedicine","finanzas":"finance","robotica":"robotics","ingenieria de software":"software engineering","pruebas de software":"software testing","sistemas distribuidos":"distributed systems","sistemas de recomendacion":"recommender systems","diagnostico":"diagnosis","imagen medica":"medical imaging","bioinformatica":"bioinformatics","epidemiologia":"epidemiology","medicina personalizada":"personalized medicine","mantenimiento predictivo":"predictive maintenance","gemelo digital":"digital twin","cadena de suministro":"supply chain","series temporales":"time series","marketing digital":"digital marketing","emprendimiento":"entrepreneurship"};
+            function es2enRule(w){ var b=nrm(w); if(GLOSS[b]) return GLOSS[b]; if(/ciones$/.test(b)) return b.replace(/ciones$/,'tions'); if(/cion$/.test(b)) return b.replace(/cion$/,'tion'); if(/sion$/.test(b)) return b.replace(/sion$/,'sion'); if(/idades$/.test(b)) return b.replace(/idades$/,'ities'); if(/idad$/.test(b)) return b.replace(/idad$/,'ity'); if(/icas$/.test(b)) return b.replace(/icas$/,'ics'); if(/icos$/.test(b)) return b.replace(/icos$/,'ics'); if(/ica$/.test(b)) return b.replace(/ica$/,'ic'); if(/ico$/.test(b)) return b.replace(/ico$/,'ic'); if(/mente$/.test(b)) return b.replace(/mente$/,'ly'); if(/abilidad$/.test(b)) return b.replace(/abilidad$/,'ability'); if(/logia$/.test(b)) return b.replace(/logia$/,'logy'); if(/grafia$/.test(b)) return b.replace(/grafia$/,'graphy'); if(/es$/.test(b)) return b.replace(/es$/,''); if(/s$/.test(b) && b.length>3) return b.replace(/s$/,''); return w; }
+            function singularES(w){ var b=nrm(w); if(/iones$/.test(b)) return b.replace(/iones$/,'ion'); if(/es$/.test(b) && !/ces$/.test(b)) return b.replace(/es$/,''); if(/s$/.test(b) && b.length>3) return b.replace(/s$/,''); return b; }
+            function expandAcronyms(text, keep){ if(!keep) return text; var t=' '+nrm(text)+' '; for(var k in ACR){ if(!ACR.hasOwnProperty(k)) continue; var patt=new RegExp(' '+k+' ','g'); if(patt.test(t)){ t=t.replace(patt,' '+ACR[k]+' '); } } return t.trim(); }
+            function splitByStops(text){ var t=nrm(text).replace(/[(){}\[\],;.:\/\\|-]/g,' '); var tokens=t.split(' ').filter(function(x){return x && !isStop(x,'es');}); var cands=[], i,j; for(i=0;i<tokens.length;i++){ for(j=1;j<=4 && (i+j)<=tokens.length;j++){ var gram=tokens.slice(i,i+j).join(' '); if(gram.length>=3) cands.push(gram); } } return uniq(cands); }
+            function scoreCandidates(cands, domain, includeMethods){ var freq={}, deg={}, i; for(i=0;i<cands.length;i++){ var words=cands[i].split(' '); var unique=uniq(words); var len=unique.length; for(var w=0;w<unique.length;w++){ var tok=singularES(unique[w]); freq[tok]=(freq[tok]||0)+1; deg[tok]=(deg[tok]||0)+(len-1); } } var wordScore={}; for(var k in freq){ if(!freq.hasOwnProperty(k)) continue; wordScore[k]=(deg[k]||0)/(freq[k]||1)+freq[k]; } var boosts=(DOMAINS[domain]||[]).map(nrm); var meth=["estudio de caso","evaluacion","benchmarking","comparativo","validacion","experimento","prototipo","arquitectura","modelo","metodologia"]; var methods=includeMethods? meth.map(nrm):[]; function boostFor(phrase){ var n=nrm(phrase), b=0, i; for(i=0;i<boosts.length;i++){ if(n.indexOf(boosts[i])>=0) b+=2.5; } for(i=0;i<methods.length;i++){ if(n.indexOf(methods[i])>=0) b+=1.2; } if(/\d/.test(n)) b+=0.5; if(n.split(' ').length>=3) b+=0.8; return b; } var scored=[]; for(i=0;i<cands.length;i++){ var parts=cands[i].split(' '), s=0; for(var p=0;p<parts.length;p++){ s+=(wordScore[singularES(parts[p])]||0); } s+=boostFor(cands[i]); if(/^(proyecto|trabajo|introduccion|conclusion|grado|tfm|tfg)$/.test(nrm(cands[i]))) s-=1.5; scored.push({term:cands[i],score:s}); } scored.sort(function(a,b){return b.score-a.score;}); return scored; }
+            function postProcessTop(scored,k){ var out=[], i=0; while(out.length<k && i<scored.length){ var t=scored[i].term, n=nrm(t); if(n.length<3 || isStop(n,'es')){ i++; continue; } var key=singularES(n), dup=false; for(var j=0;j<out.length;j++){ if(singularES(nrm(out[j]))===key){ dup=true; break; } } if(!dup) out.push(capPhrase(t)); i++; } return out; }
+            function translateList(list){ var en=[], i; for(i=0;i<list.length;i++){ var base=nrm(list[i]); if(GLOSS[base]){ en.push(capPhrase(GLOSS[base])); continue; } var parts=base.split(' '), out=[]; for(var p=0;p<parts.length;p++){ var w=parts[p]; if(!w) continue; out.push(GLOSS[w]?GLOSS[w]:es2enRule(w)); } en.push(capPhrase(out.join(' '))); } return uniq(en); }
+            var esList=[], enList=[];
+            function renderChips(containerId,list,lang){ var box=document.getElementById(containerId); if(!box) return; box.innerHTML=''; for(var i=0;i<list.length;i++){ (function(idx){ var sp=document.createElement('span'); sp.setAttribute('style','display:inline-flex;align-items:center;padding:7px 10px;margin:5px;border-radius:999px;background:#e9f3ff;color:#0e4G80;border:1px solid #c6dcff;font-size:12px;cursor:text;'); sp.title='Editar'; var txt=document.createElement('span'); txt.appendChild(document.createTextNode(list[idx])); var x=document.createElement('span'); x.appendChild(document.createTextNode('×')); x.title='Eliminar'; x.setAttribute('style','margin-left:8px;cursor:pointer;font-weight:bold;padding-left:6px;border-left:1px solid rgba(14,73,128,0.25);'); sp.addEventListener('click', function(e){ if(e.target===x) return; var nv=prompt('Editar palabra clave:', txt.textContent); if(nv!==null){ list[idx]=(nv||'').replace(/\s+/g,' ').trim(); renderChips(containerId,list,lang); if(lang==='es'){ enList=translateList(esList); renderChips('tfgp-chips-en',enList,'en'); } syncEditors(); } }); x.addEventListener('click', function(){ list.splice(idx,1); renderChips(containerId,list,lang); if(lang==='es'){ enList=translateList(esList); renderChips('tfgp-chips-en',enList,'en'); } syncEditors(); }); sp.appendChild(txt); sp.appendChild(x); box.appendChild(sp); })(i); } }
+            function meterTo(p){ var m=document.getElementById('tfgp-meter'); if(m) m.style.width=Math.max(0,Math.min(100,p))+'%'; }
+            function syncEditors(){ var a=document.getElementById('tfgp-edit-es'); var b=document.getElementById('tfgp-edit-en'); if(a) a.innerText=esList.join('\n'); if(b) b.innerText=enList.join('\n'); }
+            function syncFromEditors(){ var a=document.getElementById('tfgp-edit-es'); var b=document.getElementById('tfgp-edit-en'); var es=(a?a.innerText:'').split('\n').map(function(s){return s.trim();}).filter(Boolean); var en=(b?b.innerText:'').split('\n').map(function(s){return s.trim();}).filter(Boolean); esList=uniq(es); enList=uniq(en); renderChips('tfgp-chips-es',esList,'es'); renderChips('tfgp-chips-en',enList,'en'); }
+            function copyText(t){ if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(function(){ alert('Copiado al portapapeles.'); }); } else { alert('No se pudo copiar.'); } }
+            function exportCSV(){ var rows=[['es','en']]; var n=Math.max(esList.length,enList.length); for(var i=0;i<n;i++){ rows.push([esList[i]||'', enList[i]||'']); } var csv=rows.map(function(r){ return r.map(function(c){ return '"'+String(c||'').replace(/"/g,'""')+'"'; }).join(','); }).join('\r\n'); var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='tfg_keywords.csv'; a.style.display='none'; document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href); document.body.removeChild(a);}, 0); }
+            
+            function bindAllEvents() { 
+                var d = document;
+                d.getElementById('tfgp-generate').onclick = function(){ var t=String(d.getElementById('tfgp-title').value||'').trim(); if(!t){ alert('Introduce un título de TFG.'); return; } t=expandAcronyms(t, d.getElementById('tfgp-keepAcr').checked); var cands=splitByStops(t); var ranked=scoreCandidates(cands, d.getElementById('tfgp-domain').value, d.getElementById('tfgp-keepMeth').checked); var strong=0; for(var i=0;i<ranked.length;i++){ if(ranked[i].score>=4) strong++; } meterTo(ranked.length? Math.min(100, Math.round((strong/ranked.length)*100)) : 0); var k=parseInt(d.getElementById('tfgp-kcount').value,10)||8; esList=postProcessTop(ranked,k); enList=translateList(esList); renderChips('tfgp-chips-es',esList,'es'); renderChips('tfgp-chips-en',enList,'en'); syncEditors(); }; 
+                d.getElementById('tfgp-clear').onclick = function(){ d.getElementById('tfgp-title').value=''; esList=[]; enList=[]; renderChips('tfgp-chips-es',esList,'es'); renderChips('tfgp-chips-en',enList,'en'); syncEditors(); meterTo(0); }; 
+                d.getElementById('tfgp-copy-es').onclick = function(){ copyText(esList.join(', ')); }; 
+                d.getElementById('tfgp-copy-en').onclick = function(){ copyText(enList.join(', ')); }; 
+                d.getElementById('tfgp-export').onclick = exportCSV; 
+                d.getElementById('tfgp-sync-from').onclick = syncFromEditors; 
+                d.getElementById('tfgp-sync-to').onclick = syncEditors; 
+                d.getElementById('tfgp-title').onkeypress = function(e){ var k=e.keyCode||e.which; if(k===13){ e.preventDefault(); d.getElementById('tfgp-generate').click(); } }; 
+                d.getElementById('tfgp-toggle-advanced').onclick = function(){ var adv=d.getElementById('tfgp-advanced'); var show=adv.style.display==='none'||!adv.style.display; adv.style.display=show?'block':'none'; this.textContent=show?'Ocultar edición masiva':'Mostrar edición masiva'; }; 
+                d.getElementById('tfgp-help').onclick = function(){ var p=d.getElementById('tfgp-help-panel'); p.style.display=(p.style.display==='none'||!p.style.display)?'block':'none'; }; 
+                d.getElementById('tfgp-help-close').onclick = function(){ d.getElementById('tfgp-help-panel').style.display='none'; }; 
+                meterTo(0); 
+            }
+            
+            bindAllEvents();
+        })();
+    </script>
+
+</body>
+</html>
